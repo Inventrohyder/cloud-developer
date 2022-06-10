@@ -73,12 +73,10 @@ import { Car, cars as cars_list } from './cars';
   app.get("/cars", (req: Request, res: Response) => {
     const { make } = req.query;
 
-    let found_cars: Car[];
+    let found_cars: Car[] = cars;
 
     if (make) {
       found_cars = cars.filter((car) => car.make == make);
-    } else {
-      found_cars = cars
     }
 
     return res.status(200).send(found_cars)

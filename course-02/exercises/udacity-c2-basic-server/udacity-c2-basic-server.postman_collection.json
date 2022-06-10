@@ -119,6 +119,41 @@
 				},
 				{
 					"name": "/cars by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Body is an object or string\" + pm.request, function () {",
+									"    const id = pm.request.url.query.toObject().id;",
+									"    if (pm.response.code === 200){",
+									"        pm.expect(pm.response.json()).to.be.an('object');",
+									"    } else {",
+									"        pm.expect(pm.response.text()).to.be.an('string');",
+									"        pm.expect(pm.response.text()).to.include(`Car with id(${id}) not found`);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"The array is a car\", function() {",
+									"    car = pm.response.json();",
+									"",
+									"    if (pm.response.code === 200) {",
+									"        pm.expect(car).to.be.an('object');",
+									"        pm.expect(car.hasOwnProperty('type')).to.be.true;",
+									"        pm.expect(car.hasOwnProperty('model')).to.be.true;",
+									"        pm.expect(car.hasOwnProperty('cost')).to.be.true;",
+									"        pm.expect(car.hasOwnProperty('id')).to.be.true;",
+									"    }",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -130,7 +165,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8082/cars/2",
+							"raw": "http://localhost:8082/cars/2000",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -138,11 +173,134 @@
 							"port": "8082",
 							"path": [
 								"cars",
-								"2"
+								"2000"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "/cars by id (existing car)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8082/cars/2",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"cars",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "65"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"41-ZXDTNjsb9FC1J9XKd8h5nlCy9Cs\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 10 Jun 2022 16:07:35 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"make\": \"toyota\",\n    \"type\": \"sedan\",\n    \"model\": \"prius\",\n    \"cost\": 22,\n    \"id\": 2\n}"
+						},
+						{
+							"name": "/cars by id (no car with id)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8082/cars/2000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"cars",
+										"2000"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "27"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"1b-waQLD35YRGPqfFu1Fjo0v88NGE0\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 10 Jun 2022 16:21:13 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "Car with id(2000) not found"
+						}
+					]
 				},
 				{
 					"name": "/cars",

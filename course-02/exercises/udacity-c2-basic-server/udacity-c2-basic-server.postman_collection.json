@@ -128,8 +128,8 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Body is an object or string\" + pm.request, function () {",
-									"    const id = pm.request.url.query.toObject().id;",
+									"pm.test(\"Body is an object or string\", function () {",
+									"    const id = pm.request.url.path[1];",
 									"    if (pm.response.code === 200){",
 									"        pm.expect(pm.response.json()).to.be.an('object');",
 									"    } else {",
@@ -165,7 +165,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8082/cars/2000",
+							"raw": "http://localhost:8082/cars/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -173,7 +173,7 @@
 							"port": "8082",
 							"path": [
 								"cars",
-								"2000"
+								"2"
 							]
 						}
 					},
@@ -304,6 +304,50 @@
 				},
 				{
 					"name": "/cars",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has request body values\", function () {",
+									"    const { id, make, type, model, cost } = JSON.parse(pm.request.body);",
+									"",
+									"    const { id:resId, make:resMake, type:resType, model:resModel, cost:resCost } = pm.response.json();",
+									"",
+									"    pm.expect(id === resId).to.be.true;",
+									"    pm.expect(make === resMake).to.be.true;",
+									"    pm.expect(type === resType).to.be.true;",
+									"    pm.expect(model === resModel).to.be.true;",
+									"    pm.expect(cost === resCost).to.be.true;",
+									"});",
+									"",
+									"pm.test(\"Body is added to cars\", function () {",
+									"    const { id, make, type, model, cost } = JSON.parse(pm.request.body);",
+									"    ",
+									"    pm.sendRequest(`http://localhost:8082/cars/${id}`, (_, response) => {",
+									"        car = response.json();",
+									"        pm.expect(car).to.be.an('object');",
+									"        pm.expect(car.hasOwnProperty('type')).to.be.true;",
+									"        pm.expect(car.hasOwnProperty('model')).to.be.true;",
+									"        pm.expect(car.hasOwnProperty('cost')).to.be.true;",
+									"        pm.expect(car.hasOwnProperty('id')).to.be.true;",
+									"",
+									"        pm.expect(id === car.id).to.be.true;",
+									"        pm.expect(make === car.make).to.be.true;",
+									"        pm.expect(type === car.type).to.be.true;",
+									"        pm.expect(model === car.model).to.be.true;",
+									"        pm.expect(cost === car.cost).to.be.true;",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -316,7 +360,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \"make\": \"ford\", \"type\": \"sedan\", \"model\": \"focus\", \"cost\": 12, \"id\": 9 }\n"
+							"raw": "{\n    \"make\": \"ford\",\n    \"type\": \"sedan\",\n    \"model\": \"focus\",\n    \"cost\": 12,\n    \"id\": 9\n}"
 						},
 						"url": {
 							"raw": "http://localhost:8082/cars",
@@ -330,7 +374,72 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "/cars",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"make\": \"ford\",\n    \"type\": \"sedan\",\n    \"model\": \"focus\",\n    \"cost\": 12,\n    \"id\": 9\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8082/cars",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"cars"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "63"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"3f-Gq7L5Fy4IPcSjvkr7ojtzgniwB4\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 10 Jun 2022 17:11:40 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"make\": \"ford\",\n    \"type\": \"sedan\",\n    \"model\": \"focus\",\n    \"cost\": 12,\n    \"id\": 9\n}"
+						}
+					]
 				}
 			]
 		},

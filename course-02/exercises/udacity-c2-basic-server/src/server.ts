@@ -1,18 +1,18 @@
-import express, { Router, Request, Response } from 'express';
-import bodyParser from 'body-parser';
+import bodyParser from "body-parser";
+import express, { Request, Response } from "express";
 
-import { Car, cars as cars_list } from './cars';
+import { cars as cars_list, ICar } from "./cars";
 
 (async () => {
-  let cars: Car[] = cars_list;
+  const cars: ICar[] = cars_list;
 
-  //Create an express application
+  // Create an express application
   const app = express();
-  //default port to listen
+  // default port to listen
   const port = 8082;
 
-  //use middleware so post bodies 
-  //are accessible as req.body.{{variable}}
+  // use middleware so post bodies
+  // are accessible as req.body.{{variable}}
   app.use(bodyParser.json());
 
   // Root URI call
@@ -20,12 +20,12 @@ import { Car, cars as cars_list } from './cars';
     res.status(200).send("Welcome to the Cloud!");
   });
 
-  // Get a greeting to a specific person 
+  // Get a greeting to a specific person
   // to demonstrate routing parameters
   // > try it {{host}}/persons/:the_name
   app.get("/persons/:name",
     (req: Request, res: Response) => {
-      let { name } = req.params;
+      const { name } = req.params;
 
       if (!name) {
         return res.status(400)
@@ -39,7 +39,7 @@ import { Car, cars as cars_list } from './cars';
   // Get a greeting to a specific person to demonstrate req.query
   // > try it {{host}}/persons?name=the_name
   app.get("/persons/", (req: Request, res: Response) => {
-    let { name } = req.query;
+    const { name } = req.query;
 
     if (!name) {
       return res.status(400)
@@ -52,7 +52,7 @@ import { Car, cars as cars_list } from './cars';
 
   // Post a greeting to a specific person
   // to demonstrate req.body
-  // > try it by posting {"name": "the_name" } as 
+  // > try it by posting {"name": "the_name" } as
   // an application/json body to {{host}}/persons
   app.post("/persons",
     async (req: Request, res: Response) => {
@@ -73,13 +73,13 @@ import { Car, cars as cars_list } from './cars';
   app.get("/cars", (req: Request, res: Response) => {
     const { make } = req.query;
 
-    let found_cars: Car[] = cars;
+    let foundCars: ICar[] = cars;
 
     if (make) {
-      found_cars = cars.filter((car) => car.make == make);
+      foundCars = cars.filter((car) => car.make === make);
     }
 
-    return res.status(200).send(found_cars)
+    return res.status(200).send(foundCars);
 
   });
 
@@ -89,12 +89,12 @@ import { Car, cars as cars_list } from './cars';
   app.get("/cars/:id", (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const car: Car = cars.find((car: Car) => car.id === parseInt(id));
+    const car: ICar = cars.find((x: ICar) => x.id === parseInt(id, 10));
 
     if (car) {
       return res.status(200).send(car);
     }
-    return res.status(404).send(`Car with id(${id}) not found`)
+    return res.status(404).send(`Car with id(${id}) not found`);
   });
 
   /// @TODO Add an endpoint to post a new car to our list
@@ -115,17 +115,15 @@ import { Car, cars as cars_list } from './cars';
       return res.status(400).send("cost is required");
     }
 
+    const car: ICar = {
+      cost,
+      id,
+      make,
+      model,
+      type,
+    };
 
-    const car: Car = {
-      make: make,
-      type: type,
-      model: model,
-      cost: cost,
-      id: id
-    }
-
-
-    cars.push(car)
+    cars.push(car);
 
     return res.status(201).send(car);
 
@@ -133,7 +131,9 @@ import { Car, cars as cars_list } from './cars';
 
   // Start the Server
   app.listen(port, () => {
+    // tslint:disable-next-line: no-console
     console.log(`server running http://localhost:${port}`);
+    // tslint:disable-next-line: no-console
     console.log(`press CTRL+C to stop server`);
   });
 })();

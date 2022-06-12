@@ -127,7 +127,7 @@ import { Car, cars as cars_list } from './cars';
 
     cars.push(car)
 
-    return res.status(200).send(car);
+    return res.status(201).send(car);
 
   });
 

@@ -34,8 +34,18 @@ router.get('/:id',
 router.patch('/:id',
     requireAuth,
     async (req: Request, res: Response) => {
-        // @TODO try it yourself
-        res.status(500).send('not implemented');
+        const { id } = req.params;
+
+        const { caption, url } = req.body;
+
+        const item = await FeedItem.findByPk(id);
+        if (item) {
+            item.caption = caption ? caption : item.caption;
+            item.url = url ? url : item.url;
+            await item.save();
+            res.status(200).send(item);
+        }
+        res.status(404).send(`FeedItem with id(${id}) not found`);
     });
 
 

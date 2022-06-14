@@ -12,33 +12,35 @@ import { config } from '../../../../config/config';
 const router: Router = Router();
 
 async function generatePassword(plainTextPassword: string): Promise<string> {
-    //@TODO Use Bcrypt to Generated Salted Hashed Passwords
-    return "NotYetImplemented"
+    // @TODO Use Bcrypt to Generated Salted Hashed Passwords
+    const saltRounds = 10;
+    const salt = bcrypt.genSaltSync(saltRounds);
+    return bcrypt.hashSync(plainTextPassword, salt);
 }
 
 async function comparePasswords(plainTextPassword: string, hash: string): Promise<boolean> {
-    //@TODO Use Bcrypt to Compare your password to your Salted Hashed Password
-    return true
+    // @TODO Use Bcrypt to Compare your password to your Salted Hashed Password
+    return bcrypt.compareSync(plainTextPassword, hash);
 }
 
 function generateJWT(user: User): string {
-    //@TODO Use jwt to create a new JWT Payload containing
+    // @TODO Use jwt to create a new JWT Payload containing
     return jwt.sign(user.toJSON(), config.jwt.secret);
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
-    console.warn("auth.router not yet implemented, you'll cover this in lesson 5")
+    console.warn('auth.router not yet implemented, you\'ll cover this in lesson 5');
     return next();
     // if (!req.headers || !req.headers.authorization){
     //     return res.status(401).send({ message: 'No authorization headers.' });
     // }
-    
+
 
     // const token_bearer = req.headers.authorization.split(' ');
     // if(token_bearer.length != 2){
     //     return res.status(401).send({ message: 'Malformed token.' });
     // }
-    
+
     // const token = token_bearer[1];
 
     // return jwt.verify(token, "hello", (err, decoded) => {
@@ -49,11 +51,11 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     // });
 }
 
-router.get('/verification', 
-    requireAuth, 
+router.get('/verification',
+    requireAuth,
     async (req: Request, res: Response) => {
         return res.status(200).send({ auth: true, message: 'Authenticated.' });
-});
+    });
 
 router.post('/login', async (req: Request, res: Response) => {
     const email = req.body.email;
@@ -70,24 +72,24 @@ router.post('/login', async (req: Request, res: Response) => {
 
     const user = await User.findByPk(email);
     // check that user exists
-    if(!user) {
+    if (!user) {
         return res.status(401).send({ auth: false, message: 'Unauthorized' });
     }
 
     // check that the password matches
-    const authValid = await comparePasswords(password, user.password_hash)
+    const authValid = await comparePasswords(password, user.password_hash);
 
-    if(!authValid) {
+    if (!authValid) {
         return res.status(401).send({ auth: false, message: 'Unauthorized' });
     }
 
     // Generate JWT
     const jwt = generateJWT(user);
 
-    res.status(200).send({ auth: true, token: jwt, user: user.short()});
+    res.status(200).send({ auth: true, token: jwt, user: user.short() });
 });
 
-//register a new user
+// register a new user
 router.post('/', async (req: Request, res: Response) => {
     const email = req.body.email;
     const plainTextPassword = req.body.password;
@@ -104,7 +106,7 @@ router.post('/', async (req: Request, res: Response) => {
     // find the user
     const user = await User.findByPk(email);
     // check that user doesnt exists
-    if(user) {
+    if (user) {
         return res.status(422).send({ auth: false, message: 'User may already exist' });
     }
 
@@ -125,11 +127,11 @@ router.post('/', async (req: Request, res: Response) => {
     // Generate JWT
     const jwt = generateJWT(savedUser);
 
-    res.status(201).send({token: jwt, user: savedUser.short()});
+    res.status(201).send({ token: jwt, user: savedUser.short() });
 });
 
 router.get('/', async (req: Request, res: Response) => {
-    res.send('auth')
+    res.send('auth');
 });
 
 export const AuthRouter: Router = router;

@@ -3,17 +3,17 @@ require('dotenv').config({ path: path.resolve(process.cwd(), 'src/config/.env') 
 
 export const config = {
   'dev': {
-    'username': process.env.devUsername,
-    'password': process.env.devPassword,
-    'database': process.env.devDatabase,
-    'host': process.env.devHost,
-    'dialect': process.env.devDialect,
-    'aws_region': process.env.devAwsRegion,
-    'aws_profile': process.env.devAwsProfile,
-    'aws_media_bucket': process.env.devAwsMediaBucket
+    'username': process.env.POSTGRES_USERNAME,
+    'password': process.env.POSTGRES_PASSWORD,
+    'database': process.env.POSTGRES_DATABASE,
+    'host': process.env.POSTGRES_HOST,
+    'dialect': process.env.DATABASE_DIALECT,
+    'aws_region': process.env.AWS_REGION,
+    'aws_profile': process.env.AWS_PROFILE,
+    'aws_media_bucket': process.env.AWS_MEDIA_BUCKET
   },
   'jwt': {
-    'secret': process.env.jwtSecret
+    'secret': process.env.JWT_SECRET
   },
   'prod': {
     'username': process.env.prodUsername,

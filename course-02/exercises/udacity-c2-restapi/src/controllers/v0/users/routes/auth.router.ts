@@ -29,26 +29,24 @@ function generateJWT(user: User): string {
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
-    console.warn('auth.router not yet implemented, you\'ll cover this in lesson 5');
-    return next();
-    // if (!req.headers || !req.headers.authorization){
-    //     return res.status(401).send({ message: 'No authorization headers.' });
-    // }
+    if (!req.headers || !req.headers.authorization) {
+        return res.status(401).send({ message: 'No authorization headers.' });
+    }
 
 
-    // const token_bearer = req.headers.authorization.split(' ');
-    // if(token_bearer.length != 2){
-    //     return res.status(401).send({ message: 'Malformed token.' });
-    // }
+    const token_bearer = req.headers.authorization.split(' ');
+    if (token_bearer.length !== 2) {
+        return res.status(401).send({ message: 'Malformed token.' });
+    }
 
-    // const token = token_bearer[1];
+    const token = token_bearer[1];
 
-    // return jwt.verify(token, "hello", (err, decoded) => {
-    //   if (err) {
-    //     return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
-    //   }
-    //   return next();
-    // });
+    return jwt.verify(token, 'hello', (err, decoded) => {
+        if (err) {
+            return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
+        }
+        return next();
+    });
 }
 
 router.get('/verification',
@@ -84,9 +82,9 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     // Generate JWT
-    const jwt = generateJWT(user);
+    const jwtToken = generateJWT(user);
 
-    res.status(200).send({ auth: true, token: jwt, user: user.short() });
+    res.status(200).send({ auth: true, token: jwtToken, user: user.short() });
 });
 
 // register a new user
@@ -105,7 +103,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     // find the user
     const user = await User.findByPk(email);
-    // check that user doesnt exists
+    // check that user doesn't exists
     if (user) {
         return res.status(422).send({ auth: false, message: 'User may already exist' });
     }

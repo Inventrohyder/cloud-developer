@@ -179,12 +179,18 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
+									"    pm.response.to.have.status(201);",
 									"});",
 									"",
 									"pm.test(\"A single item is returned\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.id).to.not.eql(null);",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"    pm.expect(jsonData.token).to.not.eql(undefined);",
+									"    pm.expect(jsonData.token).to.not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Save variables\", () => {",
+									"    pm.collectionVariables.set(\"token\", pm.response.json().token);",
 									"});",
 									"",
 									"pm.test(\"Response time is less than 200ms\", function () {",
@@ -237,8 +243,8 @@
 									"",
 									"pm.test(\"auth is false and a message is included in the error body\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.id).to.not.eql(null);",
-									"    pm.expect(jsonData.message).to.not.eql(null)",
+									"    pm.expect(jsonData.message).to.not.eql(null);",
+									"    pm.expect(jsonData.message).to.not.eql(undefined);",
 									"});",
 									"",
 									"pm.test(\"Response time is less than 200ms\", function () {",
@@ -293,9 +299,11 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.auth).to.eql(true);",
 									"    pm.expect(jsonData.user).to.not.eql(null);",
-									"    pm.expect(jsonData.token).to.not.eql(null)",
+									"    pm.expect(jsonData.token).to.not.eql(null);",
+									"    pm.expect(jsonData.user).to.not.eql(undefined);",
+									"    pm.expect(jsonData.token).to.not.eql(undefined);",
 									"    ",
-									"    pm.environment.set(\"token\", jsonData.token);",
+									"    pm.collectionVariables.set(\"token\", jsonData.token);",
 									"});",
 									"",
 									"pm.test(\"Response time is less than 500ms\", function () {",
@@ -789,6 +797,10 @@
 			"key": "s3_signed_url",
 			"value": "",
 			"type": "default"
+		},
+		{
+			"key": "token",
+			"value": ""
 		}
 	]
 }

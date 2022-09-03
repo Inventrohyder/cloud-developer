@@ -38,7 +38,7 @@ exports.handler = async (event) => {
   //       Value: 0 // Total value
   //     }
   //   ],
-  //   Namespace: 'Udacity/Serveless'
+  //   Namespace: 'Udacity/Serverless'
   // }).promise()
 
   await cloudwatch.putMetricData({

@@ -6,8 +6,6 @@ import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import * as createError from 'http-errors'
-import { getUserId } from '../lambda/utils';
-import { APIGatewayProxyEvent } from 'aws-lambda';
 import { TodoUpdate } from '../models/TodoUpdate';
 
 // Implement businessLogic
@@ -18,22 +16,20 @@ const logger = createLogger('Todos')
 const todosAccess = new TodosAccess();
 const attachmentUtils = new AttachmentUtils();
 
-export async function getAllTodos(event: APIGatewayProxyEvent): Promise<TodoItem[]> {
+export async function getTodosForUser(userId: string): Promise<TodoItem[]> {
   logger.info('Getting all todos');
-  const userId = getUserId(event);
 
-  return todosAccess.getAllTodos(userId)
+  return todosAccess.getTodosForUser(userId)
 }
 
 export async function createTodo(
   createTodoRequest: CreateTodoRequest,
-  event: APIGatewayProxyEvent
+  userId: string
 ): Promise<TodoItem> {
 
   try {
     logger.info("Creating a new todo");
     const itemId = uuid.v4()
-    const userId = getUserId(event);
 
     return await todosAccess.createTodo({
       todoId: itemId,
@@ -52,6 +48,7 @@ export async function createTodo(
 export async function updateTodo(
   todoItemId: string,
   updateTodoRequest: UpdateTodoRequest,
+  userId: string,
 ): Promise<TodoUpdate> {
 
   try {
@@ -61,24 +58,27 @@ export async function updateTodo(
       name: updateTodoRequest.name,
       dueDate: updateTodoRequest.dueDate,
       done: updateTodoRequest.done
-    });
+    }, userId);
   } catch (error) {
     createError(error);
   }
 }
 
-export async function deleteTodo(todoItemId: string) {
+export async function deleteTodo(todoItemId: string, userId: string) {
   try {
     logger.info("Deleting a todo");
 
-    return await todosAccess.deleteTodo(todoItemId);
+    return await todosAccess.deleteTodo(todoItemId, userId);
   } catch (error) {
     createError(error);
   }
 }
 
-export async function createAttachmentPresignedUrl(imageId: string) {
+export async function createAttachmentPresignedUrl(imageId: string, userId: string) {
   try {
+    if (!userId)
+      throw new Error("User Id is missing");
+
     return await attachmentUtils.getUploadUrl(imageId);
   } catch (error) {
     createError(error);

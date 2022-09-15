@@ -18,7 +18,7 @@ export class TodosAccess {
     private readonly todosTable = process.env.TODOS_TABLE) {
   }
 
-  async getAllTodos(userId: string): Promise<TodoItem[]> {
+  async getTodosForUser(userId: string): Promise<TodoItem[]> {
     logger.info('Getting all todos')
 
     const result = await this.docClient.query({
@@ -43,12 +43,13 @@ export class TodosAccess {
     return todoItem;
   }
 
-  async updateTodo(todoItemId: string, todoItemUpdate: TodoUpdate): Promise<TodoUpdate> {
+  async updateTodo(todoItemId: string, todoItemUpdate: TodoUpdate, userId: string): Promise<TodoUpdate> {
     logger.info('Updating a todo');
     await this.docClient.update({
       TableName: this.todosTable,
       Key: {
-        ID: todoItemId,
+        todoId: todoItemId,
+        userId: userId,
       },
       UpdateExpression: "set name = :name, dueDate = :dueDate, done = :done",
       ExpressionAttributeValues: {
@@ -62,12 +63,13 @@ export class TodosAccess {
   }
 
 
-  async deleteTodo(todoItemId: string): Promise<boolean> {
+  async deleteTodo(todoItemId: string, userId: string): Promise<boolean> {
     logger.info('Deleting a todo');
     await this.docClient.delete({
       TableName: this.todosTable,
       Key: {
-        ID: todoItemId,
+        todoId: todoItemId,
+        userId: userId
       },
     }).promise()
 

@@ -69,7 +69,11 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
 
   }
 
-  return verify(token, jwksKey["x5c"], { algorithms: ['RS256'] }) as JwtPayload
+  return verify(
+    token,
+    `-----BEGIN CERTIFICATE-----\n${jwksKey["x5c"][0]}\n-----END CERTIFICATE-----\n`,
+    { algorithms: ['RS256'] }
+  ) as JwtPayload
 }
 
 function getToken(authHeader: string): string {

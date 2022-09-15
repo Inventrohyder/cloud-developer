@@ -20,11 +20,13 @@ export const handler = middy(
 
     const userId = getUserId(event);
 
-    const updatedItem = await updateTodo(todoId, updatedTodo, userId);
+    await updateTodo(todoId, updatedTodo, userId);
+
+    logger.info("Updated")
 
     return {
       statusCode: 204,
-      body: JSON.stringify(updatedItem)
+      body: ""
     }
   }
 )

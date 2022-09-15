@@ -54,11 +54,7 @@ export async function updateTodo(
   try {
     logger.info("Updating a todo");
 
-    return await todosAccess.updateTodo(todoItemId = todoItemId, {
-      name: updateTodoRequest.name,
-      dueDate: updateTodoRequest.dueDate,
-      done: updateTodoRequest.done
-    }, userId);
+    return await todosAccess.updateTodo(todoItemId = todoItemId, updateTodoRequest, userId);
   } catch (error) {
     createError(error);
   }

@@ -17,10 +17,11 @@ export class AttachmentUtils {
   }
 
   async getUploadUrl(imageId: string) {
+    logger.info("Getting a presigned url");
     return this.s3Client.getSignedUrl('putObject', {
       Bucket: AttachmentUtils.bucketName,
       Key: imageId,
-      Expires: this.urlExpiration
+      Expires: this.urlExpiration,
     })
   }
 

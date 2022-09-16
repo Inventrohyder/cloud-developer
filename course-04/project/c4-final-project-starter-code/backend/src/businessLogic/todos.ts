@@ -29,6 +29,11 @@ export async function createTodo(
 
   try {
     logger.info("Creating a new todo");
+
+    if (createTodoRequest.name.trim().length == 0) {
+      throw new Error("Name cannot be an empty string");
+    }
+
     const itemId = uuid.v4()
 
     return await todosAccess.createTodo({
@@ -53,6 +58,11 @@ export async function updateTodo(
 
   try {
     logger.info("Updating a todo");
+
+
+    if (updateTodoRequest.name.trim().length == 0) {
+      throw new Error("Name cannot be an empty string");
+    }
 
     return await todosAccess.updateTodo(todoItemId = todoItemId, updateTodoRequest, userId);
   } catch (error) {
